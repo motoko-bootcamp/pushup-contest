@@ -24,8 +24,15 @@ shared ({ caller = _ }) actor class C(
 
     private let VERSION = 1;
     private let INTERNAL_ERROR = "Critical error in Core, please report to devs @motokobootcamp";
+
+    private let ONE_HOUR : Nat64 = 60 * 60 * 100_000_000;
     private let SEB_PER_BOOT = 100_000_000; // 10^8 SEB per BOOT
     private let R3_IN_CYCLES = 10_000_000_000; // 100 R3 = 1T Cycles
+
+    system func timer(setGlobalTimer : Nat64 -> ()) : async () {
+        setGlobalTimer(ONE_HOUR); // absolute time in nanoseconds
+        await YC.inspect();
+    };
 
     class Boot() {
         var state : Core = {
@@ -33,6 +40,8 @@ shared ({ caller = _ }) actor class C(
             name = "Players Club";
             var players = Map.new<PlayerId, Player>();
         };
+        public func energy() : R3 { Cycles.balance() / R3_IN_CYCLES };
+        Map.set<PlayerId, Player>(state.players, phash, Principal.fromActor(this), { name = playerName; grade = #og; pushup = energy(); wallet = SEB_PER_BOOT });
 
         public func balance(pid : PlayerId) : Nat {
             switch (Map.get<PlayerId, Player>(state.players, phash, pid)) {
@@ -42,9 +51,6 @@ shared ({ caller = _ }) actor class C(
         };
         public func name() : Text { state.name };
         public func size() : Nat { state.players.size() };
-        public func energy() : R3 { Cycles.balance() / R3_IN_CYCLES };
-
-        Map.set<PlayerId, Player>(state.players, phash, Principal.fromActor(this), { name = playerName; grade = #og; pushup = energy(); wallet = SEB_PER_BOOT });
 
         public func players() : Map.Map<PlayerId, Player> {
             return state.players;
@@ -73,7 +79,7 @@ shared ({ caller = _ }) actor class C(
             let random = Random.Finite(await Random.blob());
             switch (random.range(16)) {
                 case (null) {
-                    Debug.trap(INTERNAL_ERROR);
+                    return;
                 };
                 case (?n) {
                     if (n == 0) {
