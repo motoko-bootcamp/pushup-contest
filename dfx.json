@@ -1,0 +1,14 @@
+{
+    "canisters": {
+        "pc": {
+            "main": "pc/main.mo",
+            "type": "motoko",
+            "args" : "--enhanced-orthogonal-persistence"
+        }
+    },
+    "defaults": {
+        "build": {
+            "packtool": "mops sources"
+        }
+    }
+}

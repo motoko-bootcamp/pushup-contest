@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# MOPS and DFX
+.mops
+.dfx
+
+# Canister IDs
+canister_ids.json

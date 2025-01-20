@@ -1,0 +1,5 @@
+[dependencies]
+base = "0.13.4"
+certified-assets = "0.4.0"
+map = "9.0.1"
+sha2 = "0.1.0"
